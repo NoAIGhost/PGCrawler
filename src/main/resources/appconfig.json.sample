@@ -1,0 +1,7 @@
+{
+  "username": "somebody@gmail.com",
+  "password": "gpassword",
+  "location": "coords or regular address",
+  "gmapkey": "key for gmaps",
+  "walkSpeed": 4.16
+}
