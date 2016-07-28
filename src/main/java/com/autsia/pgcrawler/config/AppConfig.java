@@ -25,6 +25,7 @@ class AppConfig {
     private String password;
     private String location;
     private String gmapkey;
+    private String auth;
     private double walkSpeed;
 
 }

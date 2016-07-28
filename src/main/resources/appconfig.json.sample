@@ -3,5 +3,6 @@
   "password": "gpassword",
   "location": "coords or regular address",
   "gmapkey": "key for gmaps",
+  "auth": "google or ptc",
   "walkSpeed": 4.16
 }
