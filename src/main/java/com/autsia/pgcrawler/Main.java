@@ -43,8 +43,12 @@ public class Main {
             CredentialProvider provider = getCredentialProvider(appConfig, httpClient);
             PokemonGo go = new PokemonGo(provider, httpClient);
             PlayerProfile playerProfile = go.getPlayerProfile();
-            System.out.println("User logged in: " + playerProfile.getUsername());
-            System.out.println("Experience: " + playerProfile.getStats().getExperience());
+            System.out.println("Name: " + playerProfile.getUsername());
+            System.out.println("Team: " + playerProfile.getTeam().name());
+            System.out.println("Level: " + playerProfile.getStats().getLevel());
+            System.out.println("Experience to next level: " + (playerProfile.getStats().getNextLevelXp() - playerProfile.getStats().getExperience()));
+            System.out.println("Pokecoin: " + playerProfile.getCurrencies().get(PlayerProfile.Currency.POKECOIN));
+            System.out.println("Stardust: " + playerProfile.getCurrencies().get(PlayerProfile.Currency.STARDUST));
         }
     }
 
@@ -57,6 +61,10 @@ public class Main {
             provider = new GoogleAutoCredentialProvider(httpClient, appConfig.getUsername(), appConfig.getPassword());
         }
         return provider;
+    }
+
+    private static void parseLocation(AppConfig appConfig) {
+        String location = appConfig.getLocation();
     }
 
 }
