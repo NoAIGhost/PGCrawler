@@ -53,7 +53,7 @@ public class Main {
             CredentialProvider provider = getCredentialProvider(appConfig, httpClient);
             PokemonGo go = new PokemonGo(provider, httpClient);
 
-            printGreeting(go.getPlayerProfile());
+            printGreeting(go);
 
             LatLng coordinates = parseLocation(appConfig);
             go.setLatitude(coordinates.lat);
@@ -66,11 +66,13 @@ public class Main {
         }
     }
 
-    private static void printGreeting(PlayerProfile playerProfile) {
+    private static void printGreeting(PokemonGo go) {
+        PlayerProfile playerProfile = go.getPlayerProfile();
         System.out.println("Name: " + playerProfile.getUsername());
         System.out.println("Team: " + playerProfile.getTeam().name());
         System.out.println("Level: " + playerProfile.getStats().getLevel());
         System.out.println("Experience to next level: " + (playerProfile.getStats().getNextLevelXp() - playerProfile.getStats().getExperience()));
+        System.out.println("Pokemons: " + go.getInventories().getPokebank().getPokemons().size());
         System.out.println("Pokecoin: " + playerProfile.getCurrencies().get(PlayerProfile.Currency.POKECOIN));
         System.out.println("Stardust: " + playerProfile.getCurrencies().get(PlayerProfile.Currency.STARDUST));
     }
