@@ -16,6 +16,7 @@
 package com.autsia.pgcrawler;
 
 import com.autsia.pgcrawler.config.AppConfig;
+import com.autsia.pgcrawler.config.AuthType;
 import com.google.gson.Gson;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.player.PlayerProfile;
@@ -25,7 +26,6 @@ import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import okhttp3.OkHttpClient;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -34,23 +34,29 @@ import java.io.Reader;
 public class Main {
 
     private static final Gson gson = new Gson();
-    public static final String APPCONFIG_JSON = "appconfig.json";
+    private static final String APPCONFIG_JSON = "appconfig.json";
 
     public static void main(String... args) throws LoginFailedException, RemoteServerException, IOException {
         try (Reader reader = new InputStreamReader(Main.class.getResourceAsStream("/" + APPCONFIG_JSON))) {
             AppConfig appConfig = gson.fromJson(reader, AppConfig.class);
             OkHttpClient httpClient = new OkHttpClient();
-            String auth = appConfig.getAuth();
-            CredentialProvider provider = null;
-            if ("ptc".equals(auth)) {
-                provider = new PtcCredentialProvider(httpClient, appConfig.getUsername(), appConfig.getPassword());
-            } else {
-                provider = new GoogleAutoCredentialProvider(httpClient, appConfig.getUsername(), appConfig.getPassword());
-            }
+            CredentialProvider provider = getCredentialProvider(appConfig, httpClient);
             PokemonGo go = new PokemonGo(provider, httpClient);
             PlayerProfile playerProfile = go.getPlayerProfile();
             System.out.println("User logged in: " + playerProfile.getUsername());
+            System.out.println("Experience: " + playerProfile.getStats().getExperience());
         }
+    }
+
+    private static CredentialProvider getCredentialProvider(AppConfig appConfig, OkHttpClient httpClient) throws LoginFailedException, RemoteServerException {
+        String auth = appConfig.getAuth();
+        CredentialProvider provider;
+        if (AuthType.PTC.name().equals(auth)) {
+            provider = new PtcCredentialProvider(httpClient, appConfig.getUsername(), appConfig.getPassword());
+        } else {
+            provider = new GoogleAutoCredentialProvider(httpClient, appConfig.getUsername(), appConfig.getPassword());
+        }
+        return provider;
     }
 
 }
