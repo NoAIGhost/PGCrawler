@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pokegoapi.api.PokemonGo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PokemonPlayerController {
     @Autowired
+    @Qualifier(value = "pokemonGo")
     private PokemonGo pokemonGo;
 
     //for test purposes
@@ -38,17 +40,23 @@ public class PokemonPlayerController {
     @ResponseBody
     public void changePlayerLocation(@RequestParam(value = "lat") String lat,
                                      @RequestParam(value = "lng") String lng) {
-        ObjectMapper mapper = new ObjectMapper();
+        if (pokemonGo == null) {
+            System.out.println("Player account is not initialized");
+            return;
+        }
         double initialLatitude = Double.parseDouble(lat);
         double initialLongitude = Double.parseDouble(lng);
         pokemonGo.setLatitude(initialLatitude);
         pokemonGo.setLongitude(initialLongitude);
-        //return "retry: 200\ndata: " + player + "\n\n";
     }
 
     @RequestMapping(value = "/getPokemonPlayer", produces = "text/event-stream")
     @ResponseBody
     public String getPlayer() {
+        if (pokemonGo == null) {
+            System.out.println("Player account is not initialized");
+            return null;
+        }
         ObjectMapper mapper = new ObjectMapper();
         MapPlayer mapPlayer = new MapPlayer();
         mapPlayer.setLatitude(pokemonGo.getLatitude());

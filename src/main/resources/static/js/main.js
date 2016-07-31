@@ -67,9 +67,9 @@ function initMap() {
                     lat: marker.getPosition().lat(),
                     lng: marker.getPosition().lng()
                 };
-                //getNearbyPokemons(newPos);
+                getNearbyPokemons(newPos);
             });
-            //getNearbyPokemons(pos);
+            getNearbyPokemons(pos);
         }, function () {
             handleLocationError(true, map, map.getCenter());
         });

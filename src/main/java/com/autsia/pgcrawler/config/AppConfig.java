@@ -44,6 +44,7 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.Assert;
@@ -56,29 +57,65 @@ import java.io.Reader;
 public class AppConfig {
 
     private static final String APPCONFIG_JSON = "appconfig.json";
+    private static final String MAPCONFIG_JSON = "mapconfig.json";
     private static final String COORDINATES_REGEXP = "^(\\-?\\d+(\\.\\d+)?),\\s*(\\-?\\d+(\\.\\d+)?)$";
     private static final String COORDINATES_DELIMITER = ", ";
 
     @Autowired
-    private Properties properties;
+    @Qualifier(value = "playerProperties")
+    private Properties playerProperties;
+    @Autowired
+    @Qualifier(value = "mapProperties")
+    private Properties mapProperties;
 
-    @Bean
-    public Properties properties() throws IOException {
+    @Bean(name = "playerProperties")
+    public Properties playerProperties() throws IOException {
         Gson gson = new Gson();
         try (Reader reader = new InputStreamReader(AppConfig.class.getResourceAsStream("/" + APPCONFIG_JSON))) {
             return gson.fromJson(reader, Properties.class);
         }
     }
 
-    @Bean
+    @Bean(name = "mapProperties")
+    public Properties mapProperties() throws IOException {
+        Gson gson = new Gson();
+        try (Reader reader = new InputStreamReader(AppConfig.class.getResourceAsStream("/" + MAPCONFIG_JSON))) {
+            return gson.fromJson(reader, Properties.class);
+        }
+    }
+
+    @Bean(name = "pokemonGo")
     public PokemonGo pokemonGo() throws Exception {
+        if (playerProperties == null){
+            System.out.println("Player properties is not initialized");
+            return null;
+        }
         OkHttpClient httpClient = new OkHttpClient();
-        CredentialProvider provider = getCredentialProvider(properties, httpClient);
+        CredentialProvider provider = getCredentialProvider(playerProperties, httpClient);
         PokemonGo go = new PokemonGo(provider, httpClient);
 
         printGreeting(go);
 
-        LatLng coordinates = parseLocation(properties);
+        LatLng coordinates = parseLocation(playerProperties);
+        go.setLatitude(coordinates.lat);
+        go.setLongitude(coordinates.lng);
+
+        return go;
+    }
+
+    @Bean(name = "mapGo")
+    public PokemonGo mapGo() throws Exception {
+        if (mapProperties == null){
+            System.out.println("Map properties is not initialized");
+            return null;
+        }
+        OkHttpClient httpClient = new OkHttpClient();
+        CredentialProvider provider = getCredentialProvider(mapProperties, httpClient);
+        PokemonGo go = new PokemonGo(provider, httpClient);
+
+        printGreeting(go);
+
+        LatLng coordinates = parseLocation(mapProperties);
         go.setLatitude(coordinates.lat);
         go.setLongitude(coordinates.lng);
 

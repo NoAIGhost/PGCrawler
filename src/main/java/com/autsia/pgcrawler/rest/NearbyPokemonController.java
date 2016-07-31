@@ -25,6 +25,7 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ import java.util.List;
 public class NearbyPokemonController {
 
     @Autowired
+    @Qualifier(value = "mapGo")
     private PokemonGo go;
 
     @RequestMapping(value = "/nearbyPokemons", method = RequestMethod.GET)
@@ -46,6 +48,9 @@ public class NearbyPokemonController {
     List<MapPokemon> getNearbyPokemons(@RequestParam(value = "lat") String lat,
                                        @RequestParam(value = "lng") String lng)
             throws LoginFailedException, RemoteServerException {
+        if (go == null) {
+            throw new RuntimeException("Map account is not initialized");
+        }
 
         double initialLatitude = Double.parseDouble(lat);
         double initialLongitude = Double.parseDouble(lng);
