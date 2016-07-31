@@ -18,7 +18,7 @@ package com.autsia.pgcrawler.rest;
 import com.autsia.pgcrawler.Main;
 import com.autsia.pgcrawler.config.AppConfig;
 import com.autsia.pgcrawler.config.AuthType;
-import com.autsia.pgcrawler.coordinates.CoordinatesFlowCalculator;
+import com.autsia.pgcrawler.coordinates.RadarStepsCalculator;
 import com.autsia.pgcrawler.rest.model.MapPokemon;
 import com.google.gson.Gson;
 import com.pokegoapi.api.PokemonGo;
@@ -72,8 +72,8 @@ public class NearbyPokemonController {
         double initialLongitude = Double.parseDouble(lng);
 
         S2LatLng initialLocation = S2LatLng.fromDegrees(initialLatitude, initialLongitude);
-        CoordinatesFlowCalculator calculator = new CoordinatesFlowCalculator();
-        List<S2LatLng> locationSteps = calculator.generateLocationSteps(initialLocation, 2);
+        RadarStepsCalculator calculator = new RadarStepsCalculator();
+        List<S2LatLng> locationSteps = calculator.generateSteps(initialLocation, 2);
         List<MapPokemon> mapPokemons = getMapPokemons(go, locationSteps);
 
         return mapPokemons;
@@ -81,7 +81,7 @@ public class NearbyPokemonController {
 
     private List<MapPokemon> getMapPokemons(PokemonGo go,
                                             List<S2LatLng> locationSteps) throws LoginFailedException, RemoteServerException {
-        System.out.println("MRN Search Pokemons START");
+        System.out.println("Search Pokemons START");
         List<MapPokemon> mapPokemons = new ArrayList<>();
         java.util.Map<Long, NearbyPokemon> encounterIdToPokemon = new HashMap<>();
         boolean firstTime = true;
@@ -92,7 +92,7 @@ public class NearbyPokemonController {
             if (firstTime) {
                 for (NearbyPokemon pokemon : map.getNearbyPokemon()) {
                     encounterIdToPokemon.put(pokemon.getEncounterId(), pokemon);
-                    System.out.println("MRN found NearbyPokemon " + pokemon.getPokemonId());
+                    System.out.println("NearbyPokemon found " + pokemon.getPokemonId());
                 }
                 firstTime = false;
             }
@@ -100,7 +100,7 @@ public class NearbyPokemonController {
                 break;
             }
             for (CatchablePokemon pokemon : map.getCatchablePokemon()) {
-                System.out.println("MRN found CatchablePokemon " + pokemon.getPokemonId());
+                System.out.println("CatchablePokemon found " + pokemon.getPokemonId());
                 encounterIdToPokemon.remove(pokemon.getEncounterId());
                 MapPokemon mapPokemon = new MapPokemon();
                 mapPokemon.setName(pokemon.getPokemonId().name());
@@ -121,7 +121,7 @@ public class NearbyPokemonController {
                 e.printStackTrace();
             }
         }
-        System.out.println("MRN Search Pokemons END");
+        System.out.println("Search Pokemons END");
         return mapPokemons;
     }
 

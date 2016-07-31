@@ -22,18 +22,7 @@ import java.util.List;
 /**
  * Created by MRN2x2 on 31.07.2016.
  */
-public class CalculateFlowCoordinatesTest {
+public interface StepsCalculator {
 
-    public static void main(String[] args) {
-        S2LatLng initialLocation = S2LatLng.fromDegrees(50.417437, 30.543307);
-        CoordinatesFlowCalculator calculator = new CoordinatesFlowCalculator();
-        List<S2LatLng> result = calculator.generateLocationSteps(initialLocation, 2);
-        int i = 0;
-        for (S2LatLng s2LatLng : result) {
-            i++;
-            System.out.println("MRN ============================" + i);
-            System.out.println("MRN latDegrees() " + s2LatLng.latDegrees());
-            System.out.println("MRN lngDegrees() " + s2LatLng.lngDegrees());
-        }
-    }
+    List<S2LatLng> generateSteps(S2LatLng initialLocation, int stepCount);
 }

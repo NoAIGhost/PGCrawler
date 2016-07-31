@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Created by MRN2x2 on 31.07.2016.
  */
-public class CoordinatesFlowCalculator {
+public class RadarStepsCalculator implements StepsCalculator {
 
     public static final double NORTH = 0;
     public static final double EAST = 90;
@@ -34,10 +34,10 @@ public class CoordinatesFlowCalculator {
     public static final double XDIST = Math.sqrt(3) * PULSE_RADIUS; // dist between column centers = 300м
     public static final double YDIST = 3 * (PULSE_RADIUS / 2);// dist between row centers = 150м
 
-    private List<S2LatLng> sortedCoordinates = new ArrayList<>();
+    private List<S2LatLng> sortedSteps = new ArrayList<>();
 
-    public List<S2LatLng> generateLocationSteps(S2LatLng initialLocation, int stepCount) {
-        sortedCoordinates.add(initialLocation);
+    public List<S2LatLng> generateSteps(S2LatLng initialLocation, int stepCount) {
+        sortedSteps.add(initialLocation);
         int ring = 1;
         S2LatLng loc = initialLocation;
         while (ring < stepCount) {
@@ -62,13 +62,13 @@ public class CoordinatesFlowCalculator {
                         loc = calculateNewCoordinates(loc, YDIST, NORTH);
                         loc = calculateNewCoordinates(loc, XDIST / 2, EAST);
                     }
-                    sortedCoordinates.add(loc);
+                    sortedSteps.add(loc);
                 }
             }
 
             ring += 1;
         }
-        return sortedCoordinates;
+        return sortedSteps;
     }
 
     private S2LatLng calculateNewCoordinates(S2LatLng initialLocation,
