@@ -23,6 +23,33 @@ function initMap() {
         zoom: 17
     });
 
+    var marker = new google.maps.Marker({
+        pos: map.getCenter(),
+        draggable: true
+    });
+
+    if (!!window.EventSource) {
+        var source = new EventSource('getPokemonPlayer');
+        source.addEventListener('message', function (e) {
+            if (e.data) {
+                var data = JSON.parse(e.data);
+                var pos = {
+                    lat: data.latitude,
+                    lng: data.longitude
+                }
+                marker.setPosition(pos);
+                map.setCenter(pos);
+            }
+        }, false);
+        source.addEventListener('error', function (e) {
+            if (e.readyState == EventSource.CLOSED) {
+                source.close();
+            }
+        }, false);
+    } else {
+        // Result to xhr polling :(
+    }
+
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
             var pos = {
@@ -31,11 +58,8 @@ function initMap() {
             };
 
             map.setCenter(pos);
-            var marker = new google.maps.Marker({
-                position: pos,
-                map: map,
-                draggable: true
-            });
+            marker.setMap(map);
+            marker.setPosition(pos);
             marker.addListener('dragend', function () {
                 map.setCenter(marker.getPosition());
                 //seems like a shit code. Is there better solution?
@@ -43,9 +67,9 @@ function initMap() {
                     lat: marker.getPosition().lat(),
                     lng: marker.getPosition().lng()
                 };
-                getNearbyPokemons(newPos);
+                //getNearbyPokemons(newPos);
             });
-            getNearbyPokemons(pos);
+            //getNearbyPokemons(pos);
         }, function () {
             handleLocationError(true, map, map.getCenter());
         });
