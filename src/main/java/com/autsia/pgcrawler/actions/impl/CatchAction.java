@@ -33,6 +33,7 @@ package com.autsia.pgcrawler.actions.impl;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import com.autsia.pgcrawler.metadata.PokemonsCache;
+import com.autsia.pgcrawler.model.BotMode;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.pokemon.CatchResult;
@@ -90,7 +91,7 @@ public class CatchAction extends AbstractAction {
                 } else {
                     log.info("Can't encounter the pokemon, reason: {]", encounterResult.getStatus().name());
                     if (encounterResult.getStatus() == EncounterResponseOuterClass.EncounterResponse.Status.POKEMON_INVENTORY_FULL) {
-                        // TODO: disable pokemon catching here
+                        properties.setBotMode(BotMode.FARM);
                     }
                 }
             }
