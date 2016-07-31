@@ -37,8 +37,6 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/home").setViewName("home");
         registry.addViewController("/").setViewName("home");
-        registry.addViewController("/login").setViewName("login");
-        registry.addViewController("/add").setViewName("add");
     }
 
     @Override
@@ -53,7 +51,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         return messageSource;
     }
 
-   @Bean
+    @Bean
     public LocaleResolver localeResolver() {
         SessionLocaleResolver slr = new SessionLocaleResolver();
         slr.setDefaultLocale(Locale.ENGLISH);

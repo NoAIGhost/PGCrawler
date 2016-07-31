@@ -16,7 +16,9 @@
 package com.autsia.pgcrawler.config;
 
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
+@Component
 public
 @Data
 class AppConfig {

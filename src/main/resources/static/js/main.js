@@ -19,12 +19,12 @@
 function initMap() {
     var mapDiv = document.getElementById('map_canvas');
     var map = new google.maps.Map(mapDiv, {
-        center:  {lat: -34.397, lng: 150.644},
+        center: {lat: 50.448944, lng: 30.523042},
         zoom: 15
     });
 
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
+        navigator.geolocation.getCurrentPosition(function (position) {
             var pos = {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
@@ -34,10 +34,11 @@ function initMap() {
             var marker = new google.maps.Marker({
                 position: pos,
                 map: map,
-                draggable:true
+                draggable: true
             });
-
-        }, function() {
+            //addPokemonsToMap(map);
+            getNearbyPokemons(pos);
+        }, function () {
             handleLocationError(true, map, map.getCenter());
         });
     } else {
@@ -50,6 +51,56 @@ function initMap() {
         infoWindow.setContent(browserHasGeolocation ?
             'Error: The Geolocation service failed.' :
             'Error: Your browser doesn\'t support geolocation.');
+    }
+
+    function getNearbyPokemons(pos) {
+        var prefix = '/nearbyPokemons';
+        // Origins, anchor positions and coordinates of the marker increase in the X
+        // direction to the right and in the Y direction down.
+
+        // Shapes define the clickable region of the icon. The type defines an HTML
+        // <area> element 'poly' which traces out a polygon as a series of X,Y points.
+        // The final coordinate closes the poly by connecting to the first coordinate.
+        var shape = {
+            coords: [1, 1, 1, 20, 18, 20, 18, 1],
+            type: 'poly'
+        };
+        $.ajax({
+            type: 'GET',
+            //url: prefix + "?lat=" + 50.417437 + "&lng=" + 30.543307,
+            url: prefix + "?lat=" + pos.lat + "&lng=" + pos.lng,
+            dataType: 'json',
+            async: true,
+            success: function (result) {
+                for (var i = 0; i < result.length; i++) {
+                    var pokemon = result[i];
+                    var latitude = pokemon.latitude;
+                    var longitude = pokemon.longitude;
+                    var pokemonName = pokemon.name;
+                    var pokemonId = pokemon.id;
+                    var pokemonExpiration = pokemon.expirationTimestampMs;
+                    var image = {
+                        url: 'static/images/pokemons/' + pokemonId + ".png",
+                        // This marker is 20 pixels wide by 32 pixels high.
+                        size: new google.maps.Size(20, 32),
+                        // The origin for this image is (0, 0).
+                        origin: new google.maps.Point(0, 0),
+                        // The anchor for this image is the base of the flagpole at (0, 32).
+                        anchor: new google.maps.Point(0, 32)
+                    };
+                    var marker = new google.maps.Marker({
+                        position: {lat: latitude, lng: longitude},
+                        map: map,
+                        icon: image,
+                        shape: shape,
+                        title: pokemonName + +" " + pokemonId + " " + pokemonExpiration
+                    });
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.status + ' ' + jqXHR.responseText);
+            }
+        });
     }
 }
 
