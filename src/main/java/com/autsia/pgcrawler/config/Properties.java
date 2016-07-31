@@ -15,6 +15,8 @@
 
 package com.autsia.pgcrawler.config;
 
+import com.autsia.pgcrawler.model.BotMode;
+
 public class Properties {
 
     private String username;
@@ -23,6 +25,7 @@ public class Properties {
     private String gmapkey;
     private String auth;
     private double walkSpeed;
+    private BotMode botMode;
 
     public String getUsername() {
         return username;
@@ -71,4 +74,13 @@ public class Properties {
     public void setWalkSpeed(double walkSpeed) {
         this.walkSpeed = walkSpeed;
     }
+
+    public BotMode getBotMode() {
+        return botMode;
+    }
+
+    public void setBotMode(BotMode botMode) {
+        this.botMode = botMode;
+    }
+
 }

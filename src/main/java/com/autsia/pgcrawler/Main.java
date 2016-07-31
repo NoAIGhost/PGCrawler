@@ -17,6 +17,7 @@ package com.autsia.pgcrawler;
 
 import com.autsia.pgcrawler.config.AuthType;
 import com.autsia.pgcrawler.config.Properties;
+import com.autsia.pgcrawler.model.BotMode;
 import com.google.gson.Gson;
 import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApi;
