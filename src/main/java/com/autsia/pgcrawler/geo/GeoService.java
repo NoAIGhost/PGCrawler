@@ -36,13 +36,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GeoService {
 
-    public static final String GEO_SERVICE_URL = "http://yournavigation.org/api/dev/route.php";
+    private static final String GEO_SERVICE_URL = "http://yournavigation.org/api/dev/route.php";
 
     public Collection<S2LatLng> getRouteCoordinates(S2LatLng start, S2LatLng end) {
         return getRouteCoordinates(start.latDegrees(), start.lngDegrees(), end.latDegrees(), end.lngDegrees());
     }
 
-    private Collection<S2LatLng> getRouteCoordinates(double flat, double flon, double tlat, double tlon) {
+    public Collection<S2LatLng> getRouteCoordinates(double flat, double flon, double tlat, double tlon) {
         String routeParsed = getRouteFile(flat, flon, tlat, tlon);
         if (!routeParsed.contains("<distance>0</distance>")) {
             routeParsed = routeParsed.split("<coordinates>")[1];

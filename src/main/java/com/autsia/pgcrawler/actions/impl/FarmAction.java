@@ -17,36 +17,35 @@ package com.autsia.pgcrawler.actions.impl;
 
 import POGOProtos.Inventory.Item.ItemAwardOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass;
+import com.autsia.pgcrawler.coordinates.PokestopComparator;
 import com.autsia.pgcrawler.metadata.PokestopsCache;
 import com.pokegoapi.api.map.fort.Pokestop;
 import com.pokegoapi.api.map.fort.PokestopLootResult;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.google.common.geometry.S2LatLng;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.TreeSet;
 
 @Slf4j
+@Component
+@Qualifier("farmAction")
 public class FarmAction extends AbstractAction {
 
+    @Autowired
     private PokestopsCache pokestopsCache;
 
     @Override
     public void perform() {
         try {
-            Collection<Pokestop> sortedStops = new TreeSet<>(go.getMap().getMapObjects().getPokestops());
-            Optional<Pokestop> stop = sortedStops.stream().sorted((stop1, stop2) -> {
-                S2LatLng locationA = S2LatLng.fromDegrees(stop1.getLatitude(), stop1.getLongitude());
-                S2LatLng locationB = S2LatLng.fromDegrees(stop2.getLatitude(), stop2.getLongitude());
-                S2LatLng currentLocation = S2LatLng.fromDegrees(go.getLatitude(), go.getLongitude());
-                Double distanceA = currentLocation.getEarthDistance(locationA);
-                Double distanceB = currentLocation.getEarthDistance(locationB);
-                return distanceA.compareTo(distanceB);
-            }).filter(pokestopsCache::isInCooldown).findFirst();
+            Collection<Pokestop> pokestops = new ArrayList<>(go.getMap().getMapObjects().getPokestops());
+            Optional<Pokestop> stop = pokestops.stream().sorted(new PokestopComparator(go)).filter(s -> !pokestopsCache.isInCooldown(s)).findFirst();
 
             stop.ifPresent(pokestop -> {
                 try {
@@ -61,16 +60,22 @@ public class FarmAction extends AbstractAction {
                             for (ItemAwardOuterClass.ItemAward itemAward : itemsAwarded) {
                                 log.info("Awarded with items: {}", itemAward.getItemId().name());
                             }
+                            pokestopsCache.setToCooldown(pokestop);
                             break;
                         case INVENTORY_FULL:
                             log.info("Looted pokestop {}", pokestopId);
                             log.info("Experience gained: {}", lootResult.getExperience());
                             log.info("Awarded with no items, because inventory is full...");
+                            pokestopsCache.setToCooldown(pokestop);
+                            break;
+                        case OUT_OF_RANGE:
+                            log.info("Can't loot pokestop {} - it's too far away, let's walk closer...", pokestopId);
+                            pokestopsCache.addStopToGo(pokestop);
                             break;
                         default:
                             log.info("Can't loot pokestop {}, reason: ", pokestopId, result.name());
+                            pokestopsCache.setToCooldown(pokestop);
                     }
-                    pokestopsCache.setToCooldown(pokestop);
                 } catch (LoginFailedException | RemoteServerException e) {
                     log.error(e.getMessage(), e);
                 }

@@ -16,16 +16,24 @@
 package com.autsia.pgcrawler.actions.impl;
 
 import com.autsia.pgcrawler.actions.PGAction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
-import java.util.List;
-
+@Component
+@Qualifier("compositeAction")
 public class CompositeAction implements PGAction {
 
-    private List<PGAction> actions;
+    @Autowired
+    private PGAction farmAction;
+
+    @Autowired
+    private PGAction walkAction;
 
     @Override
     public void perform() {
-        actions.forEach(PGAction::perform);
+        farmAction.perform();
+        walkAction.perform();
     }
 
 }

@@ -41,17 +41,25 @@ import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.EncounterResult;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.util.PokeNames;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Component
+@Qualifier("catchAction")
 public class CatchAction extends AbstractAction {
 
+    @Autowired
     private PokemonsCache pokemonsCache;
 
     @Override
@@ -64,7 +72,7 @@ public class CatchAction extends AbstractAction {
                 return;
             }
             for (CatchablePokemon catchablePokemon : catchablePokemons) {
-                log.info("Trying to catch {}", catchablePokemon.getPokemonId());
+                log.info("Trying to catch {}", PokeNames.getDisplayName(catchablePokemon.getPokemonId().getNumber(), Locale.ENGLISH));
                 EncounterResult encounterResult = catchablePokemon.encounterPokemon();
                 if (encounterResult.wasSuccessful()) {
                     log.info("Encountered {} successfully!", encounterResult.getWildPokemon().getPokemonData().getNickname());
@@ -101,7 +109,7 @@ public class CatchAction extends AbstractAction {
     }
 
     // right, I know )))
-    private boolean hasBalls() {
+    private boolean hasBalls() throws LoginFailedException, RemoteServerException {
         Collection<Item> balls = new ArrayList<>();
         for (Pokeball pokeball : Pokeball.values()) {
             balls.add(go.getInventories().getItemBag().getItem(pokeball.getBallType()));

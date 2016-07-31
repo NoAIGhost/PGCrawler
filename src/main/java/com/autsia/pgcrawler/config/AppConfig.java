@@ -42,6 +42,7 @@ import com.pokegoapi.auth.GoogleAutoCredentialProvider;
 import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -54,6 +55,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 @Configuration
+@Slf4j
 public class AppConfig {
 
     private static final String APPCONFIG_JSON = "appconfig.json";
@@ -64,6 +66,7 @@ public class AppConfig {
     @Autowired
     @Qualifier(value = "playerProperties")
     private Properties playerProperties;
+
     @Autowired
     @Qualifier(value = "mapProperties")
     private Properties mapProperties;
@@ -86,8 +89,8 @@ public class AppConfig {
 
     @Bean(name = "pokemonGo")
     public PokemonGo pokemonGo() throws Exception {
-        if (playerProperties == null){
-            System.out.println("Player properties is not initialized");
+        if (playerProperties == null) {
+            log.error("Player properties are not initialized");
             return null;
         }
         OkHttpClient httpClient = new OkHttpClient();
@@ -105,8 +108,8 @@ public class AppConfig {
 
     @Bean(name = "mapGo")
     public PokemonGo mapGo() throws Exception {
-        if (mapProperties == null){
-            System.out.println("Map properties is not initialized");
+        if (mapProperties == null) {
+            log.error("Map properties is not initialized");
             return null;
         }
         OkHttpClient httpClient = new OkHttpClient();
@@ -122,15 +125,15 @@ public class AppConfig {
         return go;
     }
 
-    private static void printGreeting(PokemonGo go) {
+    private static void printGreeting(PokemonGo go) throws LoginFailedException, RemoteServerException {
         PlayerProfile playerProfile = go.getPlayerProfile();
-        System.out.println("Name: " + playerProfile.getUsername());
-        System.out.println("Team: " + playerProfile.getTeam().name());
-        System.out.println("Level: " + playerProfile.getStats().getLevel());
-        System.out.println("Experience to next level: " + (playerProfile.getStats().getNextLevelXp() - playerProfile.getStats().getExperience()));
-        System.out.println("Pokemons: " + go.getInventories().getPokebank().getPokemons().size());
-        System.out.println("Pokecoin: " + playerProfile.getCurrencies().get(PlayerProfile.Currency.POKECOIN));
-        System.out.println("Stardust: " + playerProfile.getCurrencies().get(PlayerProfile.Currency.STARDUST));
+        log.info("Name: " + playerProfile.getPlayerData().getUsername());
+        log.info("Team: " + playerProfile.getPlayerData().getTeam().name());
+//        log.info("Level: " + playerProfile.getStats().getLevel());
+//        log.info("Experience to next level: " + (playerProfile.getStats().getNextLevelXp() - playerProfile.getStats().getExperience()));
+        log.info("Pokemons: " + go.getInventories().getPokebank().getPokemons().size());
+        log.info("Pokecoin: " + playerProfile.getCurrencies().get(PlayerProfile.Currency.POKECOIN));
+        log.info("Stardust: " + playerProfile.getCurrencies().get(PlayerProfile.Currency.STARDUST));
     }
 
     private CredentialProvider getCredentialProvider(Properties properties, OkHttpClient httpClient) throws LoginFailedException, RemoteServerException {
@@ -159,7 +162,7 @@ public class AppConfig {
             coordinates = results[0].geometry.location;
         }
         GeocodingResult[] results = GeocodingApi.reverseGeocode(context, coordinates).await();
-        System.out.println("Location: " + results[0].formattedAddress);
+        log.info("Location: " + results[0].formattedAddress);
         return coordinates;
     }
 

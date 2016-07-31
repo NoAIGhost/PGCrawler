@@ -30,18 +30,31 @@
 
 package com.autsia.pgcrawler.services;
 
-import com.autsia.pgcrawler.config.Properties;
-import com.pokegoapi.api.PokemonGo;
-import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Scope;
+import com.autsia.pgcrawler.actions.PGAction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+
 @Service
-@Scope("prototype")
-@AllArgsConstructor
 public class PGService {
 
-    private PokemonGo go;
-    private Properties properties;
+    @Autowired
+    private PGAction compositeAction;
+
+    private volatile boolean state;
+
+//    @PostConstruct
+    public void start() throws InterruptedException {
+        state = true;
+        while (state) {
+            Thread.sleep(1000L);
+            compositeAction.perform();
+        }
+    }
+
+    public void stop() {
+        state = false;
+    }
 
 }

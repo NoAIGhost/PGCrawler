@@ -15,26 +15,53 @@
 
 package com.autsia.pgcrawler.metadata;
 
+import com.autsia.pgcrawler.geo.GeoService;
+import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.fort.Pokestop;
+import com.pokegoapi.google.common.geometry.S2LatLng;
 import net.jodah.expiringmap.ExpiringMap;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class PokestopsCache {
 
+    @Autowired
+    private PokemonGo pokemonGo;
+
+    @Autowired
+    private GeoService geoService;
+
     private Map<String, Object> lootMap = ExpiringMap.builder()
             .expiration(5, TimeUnit.MINUTES)
             .build();
 
+    private LinkedHashMap<String, Collection<S2LatLng>> stopsToGo = new LinkedHashMap<>();
+
+
     public void setToCooldown(Pokestop pokestop) {
+        stopsToGo.remove(pokestop.getId());
         lootMap.put(pokestop.getId(), null);
     }
 
     public boolean isInCooldown(Pokestop pokestop) {
         return lootMap.containsKey(pokestop.getId());
+    }
+
+    public void addStopToGo(Pokestop pokestop) {
+        Collection<S2LatLng> routeCoordinates = geoService.getRouteCoordinates(pokemonGo.getLatitude(), pokemonGo.getLongitude(), pokestop.getLatitude(), pokestop.getLongitude());
+        stopsToGo.put(pokestop.getId(), routeCoordinates);
+    }
+
+    public Optional<Collection<S2LatLng>> getStopToGo() {
+        Iterator<String> iterator = stopsToGo.keySet().iterator();
+        if (iterator.hasNext()) {
+            return Optional.of(stopsToGo.get(iterator.next()));
+        }
+        return Optional.empty();
     }
 
 }
