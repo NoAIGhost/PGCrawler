@@ -33,6 +33,7 @@ package com.autsia.pgcrawler.actions.impl;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import com.autsia.pgcrawler.metadata.PokemonsCache;
+import com.autsia.pgcrawler.model.BotMode;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.pokemon.CatchResult;
@@ -68,8 +69,10 @@ public class CatchAction extends AbstractAction {
                 if (encounterResult.wasSuccessful()) {
                     log.info("Encountered {} successfully!", encounterResult.getWildPokemon().getPokemonData().getNickname());
                     int cp = encounterResult.getWildPokemon().getPokemonData().getCp();
-//                    int iv = encounterResult.getWildPokemon().getPokemonData().getIvPercentage(); TODO: get IV somehow, method is missing
-                    log.info("CP: {}, IV: {}", cp, null);
+                    int stamina = encounterResult.getWildPokemon().getPokemonData().getStamina();
+                    int attack = encounterResult.getWildPokemon().getPokemonData().getIndividualAttack();
+                    int defence = encounterResult.getWildPokemon().getPokemonData().getIndividualDefense();
+                    log.info("CP: {}, stamina: {}, attack: {}, defence: {}", cp, stamina, attack, defence);
                     CatchResult catchResult = catchablePokemon.catchPokemonWithRazzBerry();
                     if (catchResult == null) { // result may be null somehow, so we blacklist this pokemon
                         pokemonsCache.banPokemon(catchablePokemon);
@@ -88,7 +91,7 @@ public class CatchAction extends AbstractAction {
                 } else {
                     log.info("Can't encounter the pokemon, reason: {]", encounterResult.getStatus().name());
                     if (encounterResult.getStatus() == EncounterResponseOuterClass.EncounterResponse.Status.POKEMON_INVENTORY_FULL) {
-                        // TODO: disable pokemon catching here
+                        properties.setBotMode(BotMode.FARM);
                     }
                 }
             }

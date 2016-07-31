@@ -13,15 +13,10 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.autsia.pgcrawler.actions.impl;
+package com.autsia.pgcrawler.model;
 
-import com.autsia.pgcrawler.actions.PGAction;
-import com.autsia.pgcrawler.config.Properties;
-import com.pokegoapi.api.PokemonGo;
+public enum BotMode {
 
-public abstract class AbstractAction implements PGAction {
-
-    protected PokemonGo go;
-    protected Properties properties;
+    FARM, CATCH, ALL
 
 }

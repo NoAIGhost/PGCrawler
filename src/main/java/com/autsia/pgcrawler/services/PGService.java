@@ -30,7 +30,7 @@
 
 package com.autsia.pgcrawler.services;
 
-import com.autsia.pgcrawler.config.AppConfig;
+import com.autsia.pgcrawler.config.Properties;
 import com.pokegoapi.api.PokemonGo;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
@@ -42,6 +42,6 @@ import org.springframework.stereotype.Service;
 public class PGService {
 
     private PokemonGo go;
-    private AppConfig appConfig;
+    private Properties properties;
 
 }

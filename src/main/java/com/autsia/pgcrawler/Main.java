@@ -15,8 +15,9 @@
 
 package com.autsia.pgcrawler;
 
-import com.autsia.pgcrawler.config.AppConfig;
 import com.autsia.pgcrawler.config.AuthType;
+import com.autsia.pgcrawler.config.Properties;
+import com.autsia.pgcrawler.model.BotMode;
 import com.google.gson.Gson;
 import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApi;
@@ -48,14 +49,14 @@ public class Main {
 
     public static void main(String... args) throws Exception {
         try (Reader reader = new InputStreamReader(Main.class.getResourceAsStream("/" + APPCONFIG_JSON))) {
-            AppConfig appConfig = gson.fromJson(reader, AppConfig.class);
+            Properties properties = gson.fromJson(reader, Properties.class);
             OkHttpClient httpClient = new OkHttpClient();
-            CredentialProvider provider = getCredentialProvider(appConfig, httpClient);
+            CredentialProvider provider = getCredentialProvider(properties, httpClient);
             PokemonGo go = new PokemonGo(provider, httpClient);
 
             printGreeting(go);
 
-            LatLng coordinates = parseLocation(appConfig);
+            LatLng coordinates = parseLocation(properties);
             go.setLatitude(coordinates.lat);
             go.setLongitude(coordinates.lng);
 
@@ -77,20 +78,20 @@ public class Main {
         System.out.println("Stardust: " + playerProfile.getCurrencies().get(PlayerProfile.Currency.STARDUST));
     }
 
-    private static CredentialProvider getCredentialProvider(AppConfig appConfig, OkHttpClient httpClient) throws LoginFailedException, RemoteServerException {
-        String auth = appConfig.getAuth();
+    private static CredentialProvider getCredentialProvider(Properties properties, OkHttpClient httpClient) throws LoginFailedException, RemoteServerException {
+        String auth = properties.getAuth();
         CredentialProvider provider;
         if (AuthType.PTC.name().equals(auth)) {
-            provider = new PtcCredentialProvider(httpClient, appConfig.getUsername(), appConfig.getPassword());
+            provider = new PtcCredentialProvider(httpClient, properties.getUsername(), properties.getPassword());
         } else {
-            provider = new GoogleAutoCredentialProvider(httpClient, appConfig.getUsername(), appConfig.getPassword());
+            provider = new GoogleAutoCredentialProvider(httpClient, properties.getUsername(), properties.getPassword());
         }
         return provider;
     }
 
-    private static LatLng parseLocation(AppConfig appConfig) throws Exception {
-        String location = appConfig.getLocation();
-        String gmapkey = appConfig.getGmapkey();
+    private static LatLng parseLocation(Properties properties) throws Exception {
+        String location = properties.getLocation();
+        String gmapkey = properties.getGmapkey();
         Assert.notNull(location);
         Assert.notNull(gmapkey);
         GeoApiContext context = new GeoApiContext().setApiKey(gmapkey);

@@ -13,68 +13,43 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+ *   This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.autsia.pgcrawler.config;
 
-import lombok.Data;
-import org.springframework.stereotype.Component;
+import com.autsia.pgcrawler.Main;
+import com.google.gson.Gson;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-@Component
-public
-@Data
-class AppConfig {
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
-    private String username;
-    private String password;
-    private String location;
-    private String gmapkey;
-    private String auth;
-    private double walkSpeed;
+@Configuration
+public class AppConfig {
 
-    public String getUsername() {
-        return username;
+    public static final String APPCONFIG_JSON = "appconfig.json";
+
+    @Bean
+    public Properties properties() throws IOException {
+        Gson gson = new Gson();
+        try (Reader reader = new InputStreamReader(Main.class.getResourceAsStream("/" + APPCONFIG_JSON))) {
+            return gson.fromJson(reader, Properties.class);
+        }
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getGmapkey() {
-        return gmapkey;
-    }
-
-    public void setGmapkey(String gmapkey) {
-        this.gmapkey = gmapkey;
-    }
-
-    public String getAuth() {
-        return auth;
-    }
-
-    public void setAuth(String auth) {
-        this.auth = auth;
-    }
-
-    public double getWalkSpeed() {
-        return walkSpeed;
-    }
-
-    public void setWalkSpeed(double walkSpeed) {
-        this.walkSpeed = walkSpeed;
-    }
 }

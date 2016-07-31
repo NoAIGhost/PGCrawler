@@ -4,5 +4,6 @@
   "location": "coords or regular address",
   "gmapkey": "key for gmaps",
   "auth": "GOOGLE or PTC",
-  "walkSpeed": 4.16
+  "walkSpeed": 4.16,
+  "botMode":"ALL"
 }
