@@ -29,7 +29,7 @@ public class PokestopsCache {
             .expiration(5, TimeUnit.MINUTES)
             .build();
 
-    public void addPokestop(Pokestop pokestop) {
+    public void setToCooldown(Pokestop pokestop) {
         lootMap.put(pokestop.getId(), null);
     }
 

@@ -15,21 +15,15 @@
 
 package com.autsia.pgcrawler.rest;
 
-import com.autsia.pgcrawler.config.AuthType;
-import com.autsia.pgcrawler.config.Properties;
 import com.autsia.pgcrawler.coordinates.RadarStepsCalculator;
 import com.autsia.pgcrawler.rest.model.MapPokemon;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.NearbyPokemon;
-import com.pokegoapi.auth.CredentialProvider;
-import com.pokegoapi.auth.GoogleAutoCredentialProvider;
-import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.S2LatLng;
-import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,7 +38,7 @@ import java.util.List;
 public class NearbyPokemonController {
 
     @Autowired
-    private Properties properties;
+    private PokemonGo go;
 
     @RequestMapping(value = "/nearbyPokemons", method = RequestMethod.GET)
     public
@@ -53,9 +47,6 @@ public class NearbyPokemonController {
                                        @RequestParam(value = "lng") String lng)
             throws LoginFailedException, RemoteServerException {
 
-        OkHttpClient httpClient = new OkHttpClient();
-        CredentialProvider provider = getCredentialProvider(properties, httpClient);
-        PokemonGo go = new PokemonGo(provider, httpClient);
         double initialLatitude = Double.parseDouble(lat);
         double initialLongitude = Double.parseDouble(lng);
 
@@ -63,11 +54,10 @@ public class NearbyPokemonController {
         RadarStepsCalculator calculator = new RadarStepsCalculator();
         List<S2LatLng> locationSteps = calculator.generateSteps(initialLocation, 2);
 
-        return getMapPokemons(go, locationSteps);
+        return getMapPokemons(locationSteps);
     }
 
-    private List<MapPokemon> getMapPokemons(PokemonGo go,
-                                            List<S2LatLng> locationSteps) throws LoginFailedException, RemoteServerException {
+    private List<MapPokemon> getMapPokemons(List<S2LatLng> locationSteps) throws LoginFailedException, RemoteServerException {
         System.out.println("Search Pokemons START");
         List<MapPokemon> mapPokemons = new ArrayList<>();
         java.util.Map<Long, NearbyPokemon> encounterIdToPokemon = new HashMap<>();
@@ -112,15 +102,4 @@ public class NearbyPokemonController {
         return mapPokemons;
     }
 
-
-    private CredentialProvider getCredentialProvider(Properties properties, OkHttpClient httpClient) throws LoginFailedException, RemoteServerException {
-        String auth = properties.getAuth();
-        CredentialProvider provider;
-        if (AuthType.PTC.name().equals(auth)) {
-            provider = new PtcCredentialProvider(httpClient, properties.getUsername(), properties.getPassword());
-        } else {
-            provider = new GoogleAutoCredentialProvider(httpClient, properties.getUsername(), properties.getPassword());
-        }
-        return provider;
-    }
 }

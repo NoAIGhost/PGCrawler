@@ -49,10 +49,9 @@ public class FarmAction extends AbstractAction {
             }).filter(pokestopsCache::isInCooldown).findFirst();
 
             stop.ifPresent(pokestop -> {
-                PokestopLootResult lootResult = null;
                 try {
                     String pokestopId = pokestop.getId();
-                    lootResult = pokestop.loot();
+                    PokestopLootResult lootResult = pokestop.loot();
                     FortSearchResponseOuterClass.FortSearchResponse.Result result = lootResult.getResult();
                     switch (result) {
                         case SUCCESS:
@@ -71,7 +70,7 @@ public class FarmAction extends AbstractAction {
                         default:
                             log.info("Can't loot pokestop {}, reason: ", pokestopId, result.name());
                     }
-                    pokestopsCache.addPokestop(pokestop);
+                    pokestopsCache.setToCooldown(pokestop);
                 } catch (LoginFailedException | RemoteServerException e) {
                     log.error(e.getMessage(), e);
                 }
