@@ -16,12 +16,12 @@
 package com.autsia.pgcrawler.actions.impl;
 
 import com.autsia.pgcrawler.actions.PGAction;
-import com.autsia.pgcrawler.config.AppConfig;
+import com.autsia.pgcrawler.config.Properties;
 import com.pokegoapi.api.PokemonGo;
 
 public abstract class AbstractAction implements PGAction {
 
     protected PokemonGo go;
-    protected AppConfig appConfig;
+    protected Properties properties;
 
 }

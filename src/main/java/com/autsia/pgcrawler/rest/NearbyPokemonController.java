@@ -15,12 +15,10 @@
 
 package com.autsia.pgcrawler.rest;
 
-import com.autsia.pgcrawler.Main;
-import com.autsia.pgcrawler.config.AppConfig;
 import com.autsia.pgcrawler.config.AuthType;
+import com.autsia.pgcrawler.config.Properties;
 import com.autsia.pgcrawler.coordinates.RadarStepsCalculator;
 import com.autsia.pgcrawler.rest.model.MapPokemon;
-import com.google.gson.Gson;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
@@ -35,9 +33,6 @@ import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,10 +42,9 @@ import java.util.List;
  */
 @RestController
 public class NearbyPokemonController {
-    private static final Gson gson = new Gson();
-    private static final String APPCONFIG_JSON = "appconfig.json";
+
     @Autowired
-    private AppConfig appConfig;
+    private Properties properties;
 
     @RequestMapping(value = "/nearbyPokemons", method = RequestMethod.GET)
     public
@@ -58,15 +52,9 @@ public class NearbyPokemonController {
     List<MapPokemon> getNearbyPokemons(@RequestParam(value = "lat") String lat,
                                        @RequestParam(value = "lng") String lng)
             throws LoginFailedException, RemoteServerException {
-        AppConfig appConfig = null;
-        try (Reader reader = new InputStreamReader(Main.class.getResourceAsStream("/" + APPCONFIG_JSON))) {
-            appConfig = gson.fromJson(reader, AppConfig.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException();
-        }
+
         OkHttpClient httpClient = new OkHttpClient();
-        CredentialProvider provider = getCredentialProvider(appConfig, httpClient);
+        CredentialProvider provider = getCredentialProvider(properties, httpClient);
         PokemonGo go = new PokemonGo(provider, httpClient);
         double initialLatitude = Double.parseDouble(lat);
         double initialLongitude = Double.parseDouble(lng);
@@ -74,9 +62,8 @@ public class NearbyPokemonController {
         S2LatLng initialLocation = S2LatLng.fromDegrees(initialLatitude, initialLongitude);
         RadarStepsCalculator calculator = new RadarStepsCalculator();
         List<S2LatLng> locationSteps = calculator.generateSteps(initialLocation, 2);
-        List<MapPokemon> mapPokemons = getMapPokemons(go, locationSteps);
 
-        return mapPokemons;
+        return getMapPokemons(go, locationSteps);
     }
 
     private List<MapPokemon> getMapPokemons(PokemonGo go,
@@ -116,7 +103,7 @@ public class NearbyPokemonController {
 
             //temp hack to avoid ban
             try {
-                Thread.sleep(10000l);
+                Thread.sleep(10000L);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -126,13 +113,13 @@ public class NearbyPokemonController {
     }
 
 
-    private CredentialProvider getCredentialProvider(AppConfig appConfig, OkHttpClient httpClient) throws LoginFailedException, RemoteServerException {
-        String auth = appConfig.getAuth();
+    private CredentialProvider getCredentialProvider(Properties properties, OkHttpClient httpClient) throws LoginFailedException, RemoteServerException {
+        String auth = properties.getAuth();
         CredentialProvider provider;
         if (AuthType.PTC.name().equals(auth)) {
-            provider = new PtcCredentialProvider(httpClient, appConfig.getUsername(), appConfig.getPassword());
+            provider = new PtcCredentialProvider(httpClient, properties.getUsername(), properties.getPassword());
         } else {
-            provider = new GoogleAutoCredentialProvider(httpClient, appConfig.getUsername(), appConfig.getPassword());
+            provider = new GoogleAutoCredentialProvider(httpClient, properties.getUsername(), properties.getPassword());
         }
         return provider;
     }

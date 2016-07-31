@@ -68,8 +68,10 @@ public class CatchAction extends AbstractAction {
                 if (encounterResult.wasSuccessful()) {
                     log.info("Encountered {} successfully!", encounterResult.getWildPokemon().getPokemonData().getNickname());
                     int cp = encounterResult.getWildPokemon().getPokemonData().getCp();
-//                    int iv = encounterResult.getWildPokemon().getPokemonData().getIvPercentage(); TODO: get IV somehow, method is missing
-                    log.info("CP: {}, IV: {}", cp, null);
+                    int stamina = encounterResult.getWildPokemon().getPokemonData().getStamina();
+                    int attack = encounterResult.getWildPokemon().getPokemonData().getIndividualAttack();
+                    int defence = encounterResult.getWildPokemon().getPokemonData().getIndividualDefense();
+                    log.info("CP: {}, stamina: {}, attack: {}, defence: {}", cp, stamina, attack, defence);
                     CatchResult catchResult = catchablePokemon.catchPokemonWithRazzBerry();
                     if (catchResult == null) { // result may be null somehow, so we blacklist this pokemon
                         pokemonsCache.banPokemon(catchablePokemon);
