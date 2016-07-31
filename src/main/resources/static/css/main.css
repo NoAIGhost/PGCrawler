@@ -14,6 +14,9 @@
  */
 
 #map_canvas {
+    height: 100%;
     width: 100%;
-    height: 400px;
+    left: 0;
+    position: absolute;
+    top: 0;
 }

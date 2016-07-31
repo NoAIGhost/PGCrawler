@@ -20,7 +20,7 @@ function initMap() {
     var mapDiv = document.getElementById('map_canvas');
     var map = new google.maps.Map(mapDiv, {
         center: {lat: 50.448944, lng: 30.523042},
-        zoom: 15
+        zoom: 17
     });
 
     if (navigator.geolocation) {
@@ -36,7 +36,6 @@ function initMap() {
                 map: map,
                 draggable: true
             });
-            //addPokemonsToMap(map);
             getNearbyPokemons(pos);
         }, function () {
             handleLocationError(true, map, map.getCenter());

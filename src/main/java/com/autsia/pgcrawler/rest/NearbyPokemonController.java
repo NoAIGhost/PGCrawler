@@ -101,16 +101,14 @@ public class NearbyPokemonController {
             }
             for (CatchablePokemon pokemon : map.getCatchablePokemon()) {
                 System.out.println("MRN found CatchablePokemon " + pokemon.getPokemonId());
-                NearbyPokemon nearbyPokemon = encounterIdToPokemon.remove(pokemon.getEncounterId());
-                if (nearbyPokemon != null) {
-                    MapPokemon mapPokemon = new MapPokemon();
-                    mapPokemon.setName(pokemon.getPokemonId().name());
-                    mapPokemon.setId(pokemon.getPokemonId().getNumber());
-                    mapPokemon.setLatitude(pokemon.getLatitude());
-                    mapPokemon.setLongitude(pokemon.getLongitude());
-                    mapPokemon.setExpirationTimestampMs(pokemon.getExpirationTimestampMs());
-                    mapPokemons.add(mapPokemon);
-                }
+                encounterIdToPokemon.remove(pokemon.getEncounterId());
+                MapPokemon mapPokemon = new MapPokemon();
+                mapPokemon.setName(pokemon.getPokemonId().name());
+                mapPokemon.setId(pokemon.getPokemonId().getNumber());
+                mapPokemon.setLatitude(pokemon.getLatitude());
+                mapPokemon.setLongitude(pokemon.getLongitude());
+                mapPokemon.setExpirationTimestampMs(pokemon.getExpirationTimestampMs());
+                mapPokemons.add(mapPokemon);
             }
             if (encounterIdToPokemon.isEmpty()) {
                 break;
