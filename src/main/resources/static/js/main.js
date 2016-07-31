@@ -66,7 +66,7 @@ function initMap() {
         };
         $.ajax({
             type: 'GET',
-            //url: prefix + "?lat=" + 50.417437 + "&lng=" + 30.543307,
+            //url: prefix + "?lat=" + 50.448944 + "&lng=" + 30.523042,
             url: prefix + "?lat=" + pos.lat + "&lng=" + pos.lng,
             dataType: 'json',
             async: true,
