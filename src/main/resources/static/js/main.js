@@ -36,6 +36,15 @@ function initMap() {
                 map: map,
                 draggable: true
             });
+            marker.addListener('dragend', function () {
+                map.setCenter(marker.getPosition());
+                //seems like a shit code. Is there better solution?
+                var newPos = {
+                    lat: marker.getPosition().lat(),
+                    lng: marker.getPosition().lng()
+                };
+                getNearbyPokemons(newPos);
+            });
             getNearbyPokemons(pos);
         }, function () {
             handleLocationError(true, map, map.getCenter());
@@ -79,13 +88,7 @@ function initMap() {
                     var pokemonId = pokemon.id;
                     var pokemonExpiration = pokemon.expirationTimestampMs;
                     var image = {
-                        url: 'static/images/pokemons/' + pokemonId + ".png",
-                        // This marker is 20 pixels wide by 32 pixels high.
-                        size: new google.maps.Size(20, 32),
-                        // The origin for this image is (0, 0).
-                        origin: new google.maps.Point(0, 0),
-                        // The anchor for this image is the base of the flagpole at (0, 32).
-                        anchor: new google.maps.Point(0, 32)
+                        url: 'static/images/pokemons/' + pokemonId + ".png"
                     };
                     var marker = new google.maps.Marker({
                         position: {lat: latitude, lng: longitude},
